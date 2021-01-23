@@ -1,6 +1,6 @@
 import sys, os  # sys нужен для передачи argv в QApplication
 from PyQt5 import QtWidgets, QtCore, QtGui
-#from pyqtgraph import PlotWidget, plot
+import paho.mqtt.client as mqtt
 import pyqtgraph as pg
 import ui  # Это наш конвертированный файл дизайна
 from sensors import Sensor
@@ -12,6 +12,9 @@ from datetime import datetime
 import logging as log
 from collections import deque
 from gc import collect
+from scipy.optimize import curve_fit
+import numpy as np
+collect()
 
 class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
     def __init__(self):
@@ -19,11 +22,14 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         self.net = Network()
         self.sensor = Sensor()
         self.graph_data = deque()
+        self.humi_graph_data = deque()
         # Timer Periods
         self.switch_tab_period = 6000
         self.sensor_check_period = 1000
-        self.graph_add_period = 1000 * 60
-        self.graph_data_limit = 60
+        self.graph_add_period = 1000  * 60
+        self.graph_data_limit = 180
+        self.humi_graph_add_period = 1000 * 60
+        self.humi_graph_data_limit = 300
         self.new_weather_period = 1000 * 3200
         self.temperature, self.pressure, self.humidity = 0,0,0
         self.setupUi(self)  # Это нужно для инициализации нашего дизайна
@@ -41,6 +47,11 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         self.graph_timer.setInterval(self.graph_add_period)
         self.graph_timer.timeout.connect(self.update_graph)
         self.graph_timer.start()
+        # humi graph_data
+        self.humi_graph_timer = QtCore.QTimer()
+        self.humi_graph_timer.setInterval(self.humi_graph_add_period)
+        self.humi_graph_timer.timeout.connect(self.update_humi_graph)
+        self.humi_graph_timer.start()
         # Weather Timer
         self.weather_timer = QtCore.QTimer()
         self.weather_timer.setInterval(self.new_weather_period)
@@ -59,17 +70,38 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         self.plot.getPlotItem().hideAxis('left')
         self.plot.getPlotItem().enableAutoRange(axis=None, enable=True, x=None, y=None)
         self.curve = self.plot.plot(pen=pg.mkPen('r', width=1, style=QtCore.Qt.SolidLine))
+        #humi plotWidget
+        # plotWidget
+        self.humi_plot.setBackground(background)
+        self.humi_plot.getPlotItem().hideAxis('bottom')
+        self.humi_plot.getPlotItem().hideAxis('left')
+        self.humi_plot.getPlotItem().enableAutoRange(axis=None, enable=True, x=None, y=None)
+        self.humi_curve = self.humi_plot.plot(pen=pg.mkPen('b', width=1, style=QtCore.Qt.SolidLine))
+        # mqtt
+        self.mqtt_client =mqtt.Client('bme280')
+        self.mqtt_client.connect('localhost')
         # start
+        self.tabWidget.setCurrentIndex(0)
         self.weather_timer_process()
         log.info('User Interface Initialized')
+
+    def update_humi_graph(self):
+        if len(self.humi_graph_data) > self.humi_graph_data_limit:
+            self.humi_graph_data.popleft() #remove oldest
+        self.humi_graph_data.append(self.humidity)
+        self.humi_curve.setData(self.humi_graph_data)
 
     def update_graph(self):
         if len(self.graph_data) > self.graph_data_limit:
             self.graph_data.popleft() #remove oldest
         self.graph_data.append(self.pressure)
         self.curve.setData(self.graph_data)
+        #flatten = np.array(self.graph_data).flatten(order='F')
+        #print(flatten.max(), flatten.size)
+        #self.statusbar.showMessage('max:' +str(round(flatten.max() * 0.75,2)) + ' min:' +str(round(flatten.min() * 0.75,2)) + ' e:' + str(flatten.size))
+        #self.curve.setData(flatten)
         self.updown()
-        self.statusbar.showMessage("Графік оновлено",5000)
+        #self.statusbar.showMessage("Графік оновлено",5000)
 
     def updown(self):
         if self.curve.getData()[1][0] < self.pressure:
@@ -77,10 +109,11 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         else:
             self.sensor_updn_label.setText(chr(0x1eb8))
     def switch_tab(self):
-        if self.tabWidget.currentIndex() == 0:
-            self.tabWidget.setCurrentIndex(1)
-        else:
+        #print(self.tabWidget.count())
+        if self.tabWidget.currentIndex() == self.tabWidget.count() - 1:
             self.tabWidget.setCurrentIndex(0)
+        else:
+            self.tabWidget.setCurrentIndex(self.tabWidget.currentIndex() + 1)
     def set_weather_image(self, img):
         # image
         url = ' http://openweathermap.org/img/wn/' + img + '@2x.png'
@@ -100,14 +133,19 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         timeDisplay=time.toString('hh:mm:ss')
         self.sensor_time_label.setText(timeDisplay)
         self.temperature, self.pressure, self.humidity = self.sensor.get_values()
-        self.sensor_temp_label.setText(chr(0x1ebc) + str(round(self.temperature)) + chr(176))
+        self.sensor_temp_label.setText(chr(0x1ebc) + str(self.mk_temp(round(self.temperature))) + chr(176))
         self.sensor_humi_label.setText(chr(0x1ec2) + ' ' + str(round(self.humidity)))
         self.sensor_press_label.setText(chr(0x1ebe) + str(round(self.pressure * 0.75)))
+        self.mqtt_client.publish("orangepi/sensors/bme280/temperature",self.temperature)
+        self.mqtt_client.publish("orangepi/sensors/bme280/humidity",self.humidity)
+        self.mqtt_client.publish("orangepi/sensors/bme280/pressure",self.pressure)
+
     def weather_timer_process(self):
         __raw = self.net.get_weather_data()
         current_weather = __raw['current']
         tomorrow_weather = __raw['daily'][1]
-        self.weather_temperature_label.setText(str(round(current_weather['temp'])) + chr(176))
+        temp = self.mk_temp(round(current_weather['temp']))
+        self.weather_temperature_label.setText(str(temp) + chr(176))
         self.weather_feels_label.setText(str(round(current_weather['feels_like'])) + chr(176))
         self.weather_humidity_label.setText(str(round(current_weather['humidity'])) + chr(0x1ec2))
         self.weather_pressure_label.setText(chr(0x1ebe) + " " + str(round(current_weather['pressure'] * 0.75)))
@@ -118,7 +156,7 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         self.weather_time_label.setText(ob_time.strftime('%H:%M'))
         self.set_weather_image(current_weather['weather'][0]['icon'])
         # Forecast
-        temp = chr(0x1e16) + str(round(tomorrow_weather['temp']['night'])) + chr(176) + " " + chr(0x1ec6) + " " + str(round(tomorrow_weather['temp']['day'])) + chr(176)
+        temp = chr(0x1e16) + str(self.mk_temp(round(tomorrow_weather['temp']['night']))) + chr(176) + " " + chr(0x1ec6) + " " + str(self.mk_temp(round(tomorrow_weather['temp']['day']))) + chr(176)
         self.forecast_temperature_label.setText(temp)
         #self.forecast_feels_label.setText(str(round(tomorrow_weather['feels_like']['day'])) + chr(176))
         self.forecast_humidity_label.setText(str(round(tomorrow_weather['humidity'])) + chr(0x1ec2))
@@ -130,6 +168,13 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         self.set_forecast_image(tomorrow_weather['weather'][0]['icon'])
         self.statusbar.showMessage("Погода та прогноз оновлені",5000)
         collect()
+    def mk_temp(self, temp):
+        if temp > 0:
+            return "+" + str(temp)
+        elif temp == 0:
+            return str(temp)
+        else:
+            return str(temp)
 
 def main():
     QtCore.qInstallMessageHandler(qt_message_handler)
