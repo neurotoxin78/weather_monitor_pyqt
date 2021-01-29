@@ -23,13 +23,16 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         self.sensor = Sensor()
         self.graph_data = deque()
         self.humi_graph_data = deque()
+        self.temp_graph_data = deque()
         # Timer Periods
         self.switch_tab_period = 6000
         self.sensor_check_period = 1000
         self.graph_add_period = 1000  * 60
-        self.graph_data_limit = 180
+        self.graph_data_limit = 60
         self.humi_graph_add_period = 1000 * 60
-        self.humi_graph_data_limit = 300
+        self.humi_graph_data_limit = 60
+        self.temp_graph_add_period = 1000 * 60
+        self.temp_graph_data_limit = 60
         self.new_weather_period = 1000 * 3200
         self.temperature, self.pressure, self.humidity = 0,0,0
         self.setupUi(self)  # Это нужно для инициализации нашего дизайна
@@ -52,6 +55,11 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         self.humi_graph_timer.setInterval(self.humi_graph_add_period)
         self.humi_graph_timer.timeout.connect(self.update_humi_graph)
         self.humi_graph_timer.start()
+        # temp graph_data
+        self.temp_graph_timer = QtCore.QTimer()
+        self.temp_graph_timer.setInterval(self.temp_graph_add_period)
+        self.temp_graph_timer.timeout.connect(self.update_temp_graph)
+        self.temp_graph_timer.start()
         # Weather Timer
         self.weather_timer = QtCore.QTimer()
         self.weather_timer.setInterval(self.new_weather_period)
@@ -62,58 +70,122 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         self.switch_tab_timer.setInterval(self.switch_tab_period)
         self.switch_tab_timer.timeout.connect(self.switch_tab)
         self.switch_tab_timer.start()
+        #switch_sensor_tab
+        self.switch_sensor_tab_timer = QtCore.QTimer()
+        self.switch_sensor_tab_timer.setInterval(self.switch_tab_period)
+        self.switch_sensor_tab_timer.timeout.connect(self.switch_sensor_tab)
+        self.switch_sensor_tab_timer.start()
         # plotWidget
         background = QtGui.QBrush()
         background.setColor(QtGui.QColor(0x31363b))
+        l = pg.LegendItem((10,10), offset=(60,75))  # args are (size, offset)
+        l.setParentItem(self.plot.graphicsItem())   # Note we do NOT call plt.addItem in this case
         self.plot.setBackground(background)
-        self.plot.getPlotItem().hideAxis('bottom')
-        self.plot.getPlotItem().hideAxis('left')
+        self.plot.addLegend()
+        self.plot.plotItem.showGrid(x=True, y=True, alpha=0.3)
+        self.plot.getPlotItem().addLegend()
         self.plot.getPlotItem().enableAutoRange(axis=None, enable=True, x=None, y=None)
-        self.curve = self.plot.plot(pen=pg.mkPen('r', width=1, style=QtCore.Qt.SolidLine))
+        self.curve = self.plot.plot(pen=pg.mkPen('r', width=1, name="атмосферний тиск", symbol='o',symbolPen='r', symbolBrush=0.5, style=QtCore.Qt.SolidLine))
+        l.addItem(self.curve, 'атмосферний тиск mmHg')
         #humi plotWidget
         # plotWidget
         self.humi_plot.setBackground(background)
-        self.humi_plot.getPlotItem().hideAxis('bottom')
-        self.humi_plot.getPlotItem().hideAxis('left')
+        lh = pg.LegendItem((10,10), offset=(95,75))  # args are (size, offset)
+        lh.setParentItem(self.humi_plot.graphicsItem())   # Note we do NOT call plt.addItem in this case
+        self.humi_plot.plotItem.showGrid(x=True, y=True, alpha=0.3)
         self.humi_plot.getPlotItem().enableAutoRange(axis=None, enable=True, x=None, y=None)
         self.humi_curve = self.humi_plot.plot(pen=pg.mkPen('b', width=1, style=QtCore.Qt.SolidLine))
+        lh.addItem(self.humi_curve, 'вологість %')
+        #temp plotWidget
+        # plotWidget
+        self.temp_plot.setBackground(background)
+        lh = pg.LegendItem((10,10), offset=(95,75))  # args are (size, offset)
+        lh.setParentItem(self.temp_plot.graphicsItem())   # Note we do NOT call plt.addItem in this case
+        self.temp_plot.plotItem.showGrid(x=True, y=True, alpha=0.3)
+        self.temp_plot.getPlotItem().enableAutoRange(axis=None, enable=True, x=None, y=None)
+        self.temp_curve = self.temp_plot.plot(pen=pg.mkPen('g', width=1, style=QtCore.Qt.SolidLine))
+        lh.addItem(self.temp_curve, 'температура ' + chr(176) + 'C')
         # mqtt
         self.mqtt_client =mqtt.Client('bme280')
         self.mqtt_client.connect('localhost')
+        # Styling
+
         # start
         self.tabWidget.setCurrentIndex(0)
         self.weather_timer_process()
+        #self.update_graph()
+        #self.update_humi_graph()
         log.info('User Interface Initialized')
+
+    def update_temp_graph(self):
+        if len(self.temp_graph_data) > self.temp_graph_data_limit:
+            self.temp_graph_data.popleft() #remove oldest
+        self.temp_graph_data.append(self.temperature)
+        self.temp_curve.setData(self.temp_graph_data)
+        self.temp_updown()
 
     def update_humi_graph(self):
         if len(self.humi_graph_data) > self.humi_graph_data_limit:
             self.humi_graph_data.popleft() #remove oldest
         self.humi_graph_data.append(self.humidity)
         self.humi_curve.setData(self.humi_graph_data)
+        self.humi_updown()
 
     def update_graph(self):
         if len(self.graph_data) > self.graph_data_limit:
             self.graph_data.popleft() #remove oldest
-        self.graph_data.append(self.pressure)
+        self.graph_data.append(self.pressure * 0.750062)
         self.curve.setData(self.graph_data)
         #flatten = np.array(self.graph_data).flatten(order='F')
         #print(flatten.max(), flatten.size)
         #self.statusbar.showMessage('max:' +str(round(flatten.max() * 0.75,2)) + ' min:' +str(round(flatten.min() * 0.75,2)) + ' e:' + str(flatten.size))
         #self.curve.setData(flatten)
-        self.updown()
+        self.press_updown()
         #self.statusbar.showMessage("Графік оновлено",5000)
 
-    def updown(self):
-        if self.curve.getData()[1][0] < self.pressure:
-            self.sensor_updn_label.setText(chr(0x1eba))
+    def press_updown(self):
+        maximum = round(self.curve.getData()[1].max(), 2)
+        last_item = round(self.curve.getData()[1][-1], 2)
+        #print(maximum, last_item)
+        self.sensor_press_max_label.setText('max:' + str(maximum))
+        if maximum < last_item:
+            self.sensor_updn_label.setText(chr(0x1eba)) # UP
+        elif maximum == last_item:
+            self.sensor_updn_label.setText(chr(0x2248)) # # approx equal
         else:
-            self.sensor_updn_label.setText(chr(0x1eb8))
+            self.sensor_updn_label.setText(chr(0x1eb8)) # down
+    def humi_updown(self):
+        maximum = round(self.humi_curve.getData()[1].max(), 2)
+        last_item = round(self.humi_curve.getData()[1][-1], 2)
+        #print(maximum, last_item)
+        if maximum < last_item:
+            self.sensor_updn_humi_label.setText(chr(0x1eba)) # UP
+        elif maximum == last_item:
+            self.sensor_updn_humi_label.setText(chr(0x2248)) # approx equal
+        else:
+            self.sensor_updn_humi_label.setText(chr(0x1eb8)) # down
+    def temp_updown(self):
+        maximum = round(self.temp_curve.getData()[1].max(), 2)
+        last_item = round(self.temp_curve.getData()[1][-1], 2)
+        #print(maximum, last_item)
+        if maximum < last_item:
+            self.sensor_updn_temp_label.setText(chr(0x1eba)) # UP
+        elif maximum == last_item:
+            self.sensor_updn_temp_label.setText(chr(0x2248)) # approx equal
+        else:
+            self.sensor_updn_temp_label.setText(chr(0x1eb8)) # down
     def switch_tab(self):
         #print(self.tabWidget.count())
         if self.tabWidget.currentIndex() == self.tabWidget.count() - 1:
             self.tabWidget.setCurrentIndex(0)
         else:
             self.tabWidget.setCurrentIndex(self.tabWidget.currentIndex() + 1)
+    def switch_sensor_tab(self):
+        #print(self.tabWidget.count())
+        if self.sensor_tab_widget.currentIndex() == self.sensor_tab_widget.count() - 1:
+            self.sensor_tab_widget.setCurrentIndex(0)
+        else:
+            self.sensor_tab_widget.setCurrentIndex(self.sensor_tab_widget.currentIndex() + 1)
     def set_weather_image(self, img):
         # image
         url = ' http://openweathermap.org/img/wn/' + img + '@2x.png'
@@ -166,7 +238,6 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         dt = datetime.fromtimestamp(tomorrow_weather['dt'])
         self.forecast_date_label.setText(dt.strftime('%d-%m-%Y'))
         self.set_forecast_image(tomorrow_weather['weather'][0]['icon'])
-        self.statusbar.showMessage("Погода та прогноз оновлені",5000)
         collect()
     def mk_temp(self, temp):
         if temp > 0:

@@ -1,0 +1,1217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>320</width>
+    <height>240</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>320</width>
+    <height>240</height>
+   </size>
+  </property>
+  <property name="baseSize">
+   <size>
+    <width>320</width>
+    <height>240</height>
+   </size>
+  </property>
+  <property name="cursor">
+   <cursorShape>BlankCursor</cursorShape>
+  </property>
+  <property name="windowTitle">
+   <string>Погода та прогноз</string>
+  </property>
+  <property name="windowOpacity">
+   <double>1.000000000000000</double>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background:rgb(91,90,90);</string>
+  </property>
+  <property name="animated">
+   <bool>false</bool>
+  </property>
+  <property name="documentMode">
+   <bool>false</bool>
+  </property>
+  <property name="dockNestingEnabled">
+   <bool>false</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="baseSize">
+    <size>
+     <width>320</width>
+     <height>240</height>
+    </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: qlineargradient(spread:reflect, x1:1, y1:0.529, x2:1, y2:0, stop:0.641791 rgba(80, 80, 80, 255), stop:1 rgba(39, 40, 44, 255));</string>
+   </property>
+   <widget class="QTabWidget" name="main_tab_widget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>320</width>
+      <height>241</height>
+     </rect>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QWidget{background:transparent;
+color: rgb(229, 229, 229);
+}
+
+QTabBar::tab {
+    color: rgb(157, 157, 157);
+    border: 1px solid rgb(100, 100, 100);
+    border-left: 0px transparent black;
+    background-color: transparent;
+    padding: 3px;
+	min-width: 18px;
+	min-height: 80px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+QTabBar::tab::selected {
+    color: #eff0f1;
+    background-color: #54575B;
+    border: 0px solid #76797C;
+    border-left: 3px solid rgb(152, 152, 152);
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+QTabBar::tab::!selected:hover {
+    background-color: qlineargradient(spread:pad, x1:0.392672, y1:0.443, x2:0.0646766, y2:0.45, stop:0.606965 rgba(255, 55, 0, 0), stop:1 rgba(255, 111, 0, 240));
+}
+</string>
+    </property>
+    <property name="tabPosition">
+     <enum>QTabWidget::West</enum>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <property name="elideMode">
+     <enum>Qt::ElideNone</enum>
+    </property>
+    <property name="documentMode">
+     <bool>true</bool>
+    </property>
+    <property name="tabBarAutoHide">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="sensor_tab">
+     <property name="styleSheet">
+      <string notr="true">background-color: qlineargradient(spread:reflect, x1:1, y1:0.529, x2:1, y2:0, stop:0.641791 rgba(80, 80, 80, 255), stop:1 rgba(39, 40, 44, 255));</string>
+     </property>
+     <attribute name="title">
+      <string>Сенсор</string>
+     </attribute>
+     <widget class="QTabWidget" name="sensor_tab_widget">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>50</y>
+        <width>291</width>
+        <height>171</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QWidget{background:transparent;
+color: rgb(229, 229, 229);
+}
+/* TOP TABS */
+QTabWidget {
+    border: 0px transparent black;
+}
+
+QTabWidget::pane {
+    border: 0px solid #76797C;
+    padding: 2px;
+    margin: 0px;
+}
+
+QTabWidget::tab-bar {
+   left: 15px; 
+}
+
+QTabBar {
+    qproperty-drawBase: 0;
+    border-radius: 3px;
+}
+
+QTabBar:focus {
+    border: 0px transparent black;
+}
+QTabBar::tab:top {
+    color: rgb(154, 154, 154);
+    border: 1px solid rgba(125, 125, 125, 100);
+    border-right: 0px rgb(127, 127, 127);
+    background-color: transparent;
+    padding: 2px;
+    min-width: 80px;
+	min-height: 18px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+QTabBar::tab:top:selected {
+    color: #eff0f1;
+    background-color: #54575B;
+    border: 1px solid rgba(105, 105, 105, 100);
+    border-bottom: 3px solid rgb(152, 152, 152);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+QTabBar::tab:top:!selected:hover {
+    background-color: qlineargradient(spread:pad, x1:0.393, y1:0.669636, x2:0.393, y2:0.915, stop:0.606965 rgba(255, 55, 0, 0), stop:1 rgba(255, 111, 0, 240));
+}
+</string>
+      </property>
+      <property name="tabPosition">
+       <enum>QTabWidget::North</enum>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="documentMode">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="tab_pressure">
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <attribute name="title">
+        <string>Тиск</string>
+       </attribute>
+       <widget class="PlotWidget" name="plot" native="true">
+        <property name="geometry">
+         <rect>
+          <x>4</x>
+          <y>10</y>
+          <width>275</width>
+          <height>131</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: transparent;
+color: #FB9902;
+</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_humidity">
+       <attribute name="title">
+        <string>Вологість</string>
+       </attribute>
+       <widget class="PlotWidget" name="humi_plot" native="true">
+        <property name="geometry">
+         <rect>
+          <x>4</x>
+          <y>10</y>
+          <width>275</width>
+          <height>130</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">/*-----QWidget-----*/
+QWidget
+{
+	background-color: transparent;
+	color: #FB9902;
+}</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_temperature">
+       <attribute name="title">
+        <string>Температура</string>
+       </attribute>
+       <widget class="PlotWidget" name="temp_plot" native="true">
+        <property name="geometry">
+         <rect>
+          <x>4</x>
+          <y>10</y>
+          <width>275</width>
+          <height>130</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">/*-----QWidget-----*/
+QWidget
+{
+	background-color: transparent;
+	color: #CDEBB7;
+}</string>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+     <widget class="QLabel" name="sensor_temp_label">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>3</y>
+        <width>60</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Source Sans Pro SemiBold</family>
+        <pointsize>16</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	background-color: transparent;
+	color: #CDEBB7;
+	font: 16pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+      </property>
+      <property name="text">
+       <string>+20</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="sensor_press_label">
+      <property name="geometry">
+       <rect>
+        <x>185</x>
+        <y>3</y>
+        <width>71</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Source Sans Pro SemiBold</family>
+        <pointsize>16</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">/*-----QLabel-----*/
+QLabel
+{
+	background-color: transparent;
+	color: #FE5010;
+	font: 16pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+      </property>
+      <property name="text">
+       <string>752</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="sensor_humi_label">
+      <property name="geometry">
+       <rect>
+        <x>76</x>
+        <y>3</y>
+        <width>81</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Source Sans Pro SemiBold</family>
+        <pointsize>16</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">/*-----QLabel-----*/
+QLabel
+{
+	background-color: transparent;
+	color: #5da6e2;
+	font:16pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+      </property>
+      <property name="text">
+       <string>100%</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="sensor_updn_label">
+      <property name="geometry">
+       <rect>
+        <x>260</x>
+        <y>3</y>
+        <width>21</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Source Sans Pro SemiBold</family>
+        <pointsize>20</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">/*-----QLabel-----*/
+QLabel
+{
+	background-color: transparent;
+	color: #FE5010;
+	font: 20pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+      <property name="indent">
+       <number>1</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="sensor_time_label">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>215</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Source Sans Pro SemiBold</family>
+        <pointsize>11</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">/*-----QLabel-----*/
+QLabel
+{
+	background-color: transparent;
+	color: #E1ECF9;
+	font: 11pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+      </property>
+      <property name="text">
+       <string>00:00</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="sensor_press_max_label">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>30</y>
+        <width>71</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Source Sans Pro Bold</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">/*-----QLabel-----*/
+QLabel
+{
+	background-color: transparent;
+	color: #FE5010;
+	font: 8pt &quot;Source Sans Pro Bold&quot;;
+}</string>
+      </property>
+      <property name="text">
+       <string>max: 752</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="sensor_updn_humi_label">
+      <property name="geometry">
+       <rect>
+        <x>162</x>
+        <y>3</y>
+        <width>21</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Source Sans Pro SemiBold</family>
+        <pointsize>20</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">/*-----QLabel-----*/
+QLabel
+{
+	background-color: transparent;
+	color: #5da6e2;
+	font: 20pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+      <property name="indent">
+       <number>1</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="sensor_updn_temp_label">
+      <property name="geometry">
+       <rect>
+        <x>62</x>
+        <y>3</y>
+        <width>21</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Source Sans Pro SemiBold</family>
+        <pointsize>20</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">/*-----QLabel-----*/
+QLabel
+{
+	background-color: transparent;
+	color: #CDEBB7;
+	font: 20pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+      <property name="indent">
+       <number>1</number>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="weaher_and_forecast_tab">
+     <attribute name="title">
+      <string>Метеоданні</string>
+     </attribute>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>295</width>
+        <height>220</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QWidget{background:transparent}
+QTabBar {
+    qproperty-drawBase: 0;
+    border-radius: 5px;
+}
+
+QTabBar:focus {
+    border: 0px transparent black;
+}
+
+/* TOP TABS */
+
+QTabBar::tab:top {
+    color: #eff0f1;
+    border: 1px solid rgba(105, 105, 105, 100);
+    border-right: 1px rgb(127, 127, 127);
+    background-color: #54575B;
+    padding: 2px;
+    min-width: 80px;
+	min-height: 20px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+QTabBar::tab:top:selected {
+    color: #eff0f1;
+    background-color: #54575B;
+    border: 1px solid rgba(105, 105, 105, 100);
+    border-right: 4px solid rgb(255, 85, 0);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+QTabBar::tab:top:!selected:hover {
+    background-color: qlineargradient(spread:pad, x1:0.527, y1:0.221591, x2:0.527363, y2:0.961, stop:0.606965 rgba(255, 85, 0, 0), stop:1 rgba(255, 111, 0, 240));
+}
+</string>
+      </property>
+      <property name="tabPosition">
+       <enum>QTabWidget::North</enum>
+      </property>
+      <property name="tabShape">
+       <enum>QTabWidget::Rounded</enum>
+      </property>
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>1</width>
+        <height>1</height>
+       </size>
+      </property>
+      <property name="elideMode">
+       <enum>Qt::ElideNone</enum>
+      </property>
+      <property name="usesScrollButtons">
+       <bool>true</bool>
+      </property>
+      <property name="documentMode">
+       <bool>true</bool>
+      </property>
+      <property name="tabBarAutoHide">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="weather_tab">
+       <attribute name="title">
+        <string>Погода</string>
+       </attribute>
+       <widget class="QLabel" name="weather_description_label">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>165</y>
+          <width>271</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Source Pro</family>
+          <pointsize>14</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel
+{
+	background-color: transparent;
+	color: #ffa73c;
+	font: 14pt &quot;Source Pro&quot;;
+}</string>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>description</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="weather_feels_label">
+        <property name="geometry">
+         <rect>
+          <x>230</x>
+          <y>30</y>
+          <width>51</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Source Sans Pro SemiBold</family>
+          <pointsize>20</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel
+{
+	background-color: transparent;
+	color: #94D466;
+	font: 20pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+        </property>
+        <property name="text">
+         <string>00</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="weather_humidity_label">
+        <property name="geometry">
+         <rect>
+          <x>170</x>
+          <y>20</y>
+          <width>71</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Source Sans Pro SemiBold</family>
+          <pointsize>14</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel
+{
+	background-color: transparent;
+	color: #5da6e2;
+	font: 14pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+        </property>
+        <property name="text">
+         <string>000</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="weather_temperature_label">
+        <property name="geometry">
+         <rect>
+          <x>140</x>
+          <y>50</y>
+          <width>101</width>
+          <height>91</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Source Sans Pro SemiBold</family>
+          <pointsize>50</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel
+{
+	background-color: transparent;
+	color: #CDEBB7;
+	font: 50pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+        </property>
+        <property name="text">
+         <string>00</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="weather_wind_label">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>140</y>
+          <width>171</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Source Sans Pro SemiBold</family>
+          <pointsize>14</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel
+{
+	background-color: transparent;
+	color: #ffa73c;
+	font: 14pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+        </property>
+        <property name="text">
+         <string>wind</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="weather_uvi_label">
+        <property name="geometry">
+         <rect>
+          <x>210</x>
+          <y>140</y>
+          <width>71</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Source Sans Pro SemiBold</family>
+          <pointsize>12</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel
+{
+	background-color: transparent;
+	color: #9191F0;
+	font: 12pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>uvi:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="image_label">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>70</y>
+          <width>80</width>
+          <height>61</height>
+         </rect>
+        </property>
+        <property name="lineWidth">
+         <number>0</number>
+        </property>
+        <property name="text">
+         <string>image</string>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="weather_pressure_label">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>20</y>
+          <width>71</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Source Sans Pro SemiBold</family>
+          <pointsize>14</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel
+{
+	background-color: transparent;
+	color: #FE5010;
+	font: 14pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+        </property>
+        <property name="text">
+         <string>000</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="weather_time_label">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>0</y>
+          <width>91</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Source Sans Pro SemiBold</family>
+          <pointsize>12</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel
+{
+	background-color: transparent;
+	color: #FBFDE2;
+	font: 12pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>00:00</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="forecast_tab">
+       <attribute name="title">
+        <string>Прогноз</string>
+       </attribute>
+       <widget class="QLabel" name="forecast_date_label">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>5</y>
+          <width>111</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Source Sans Pro SemiBold</family>
+          <pointsize>14</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel
+{
+	background-color: transparent;
+	color: #FBFDE2;
+	font: 14pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+        </property>
+        <property name="text">
+         <string>00/00/0000</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="forecast_temperature_label">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>80</y>
+          <width>251</width>
+          <height>51</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Source Sans Pro SemiBold</family>
+          <pointsize>36</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel
+{
+	background-color: transparent;
+	color: #CDEBB7;
+	font: 36pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+        </property>
+        <property name="text">
+         <string>00</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="forecast_humidity_label">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>30</y>
+          <width>51</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Source Sans Pro SemiBold</family>
+          <pointsize>14</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel
+{
+	background-color: transparent;
+	color: #5da6e2;
+	font: 14pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+        </property>
+        <property name="text">
+         <string>000</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="forecast_pressure_label">
+        <property name="geometry">
+         <rect>
+          <x>150</x>
+          <y>30</y>
+          <width>51</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Source Sans Pro SemiBold</family>
+          <pointsize>14</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel
+{
+	background-color: transparent;
+	color: #FE5010;
+	font: 14pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+        </property>
+        <property name="text">
+         <string>000</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="forecast_image_label">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>80</width>
+          <height>61</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>image</string>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="forecast_description_label">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>160</y>
+          <width>281</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Source Pro</family>
+          <pointsize>14</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel
+{
+	background-color: transparent;
+	color: #ffa73c;
+	font: 14pt &quot;Source Pro&quot;;
+}</string>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>description</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="forecast_wind_label">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>140</y>
+          <width>171</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Source Sans Pro SemiBold</family>
+          <pointsize>14</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel
+{
+	background-color: transparent;
+	color: #ffa73c;
+	font: 14pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+        </property>
+        <property name="text">
+         <string>wind</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PlotWidget</class>
+   <extends>QWidget</extends>
+   <header>pyqtgraph</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+ <designerdata>
+  <property name="gridDeltaX">
+   <number>10</number>
+  </property>
+  <property name="gridDeltaY">
+   <number>10</number>
+  </property>
+  <property name="gridSnapX">
+   <bool>true</bool>
+  </property>
+  <property name="gridSnapY">
+   <bool>true</bool>
+  </property>
+  <property name="gridVisible">
+   <bool>true</bool>
+  </property>
+ </designerdata>
+</ui>
