@@ -96,7 +96,7 @@ QTabBar::tab {
 
 QTabBar::tab::selected {
     color: #eff0f1;
-    background-color: #54575B;
+    background-color: rgb(120, 120, 120);
     border: 0px solid #76797C;
     border-left: 3px solid rgb(152, 152, 152);
     border-top-right-radius: 0px;
@@ -112,7 +112,7 @@ QTabBar::tab::!selected:hover {
      <enum>QTabWidget::West</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideNone</enum>
@@ -180,9 +180,9 @@ QTabBar::tab:top {
 
 QTabBar::tab:top:selected {
     color: #eff0f1;
-    background-color: #54575B;
+    background-color:rgb(110, 110, 110);
     border: 1px solid rgba(105, 105, 105, 100);
-    border-bottom: 3px solid rgb(152, 152, 152);
+    border-bottom: 1px solid rgb(255, 119, 0);
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
 }
@@ -201,26 +201,26 @@ QTabBar::tab:top:!selected:hover {
       <property name="documentMode">
        <bool>true</bool>
       </property>
-      <widget class="QWidget" name="tab_pressure">
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
+      <widget class="QWidget" name="tab_temperature">
        <attribute name="title">
-        <string>Тиск</string>
+        <string>Температура</string>
        </attribute>
-       <widget class="PlotWidget" name="plot" native="true">
+       <widget class="PlotWidget" name="temp_plot" native="true">
         <property name="geometry">
          <rect>
           <x>4</x>
           <y>10</y>
           <width>275</width>
-          <height>131</height>
+          <height>130</height>
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: transparent;
-color: #FB9902;
-</string>
+         <string notr="true">/*-----QWidget-----*/
+QWidget
+{
+	background-color: transparent;
+	color: #CDEBB7;
+}</string>
         </property>
        </widget>
       </widget>
@@ -247,26 +247,26 @@ QWidget
         </property>
        </widget>
       </widget>
-      <widget class="QWidget" name="tab_temperature">
+      <widget class="QWidget" name="tab_pressure">
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
        <attribute name="title">
-        <string>Температура</string>
+        <string>Тиск</string>
        </attribute>
-       <widget class="PlotWidget" name="temp_plot" native="true">
+       <widget class="PlotWidget" name="plot" native="true">
         <property name="geometry">
          <rect>
           <x>4</x>
           <y>10</y>
           <width>275</width>
-          <height>130</height>
+          <height>131</height>
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">/*-----QWidget-----*/
-QWidget
-{
-	background-color: transparent;
-	color: #CDEBB7;
-}</string>
+         <string notr="true">background-color: transparent;
+color: #FB9902;
+</string>
         </property>
        </widget>
       </widget>
@@ -274,7 +274,7 @@ QWidget
      <widget class="QLabel" name="sensor_temp_label">
       <property name="geometry">
        <rect>
-        <x>0</x>
+        <x>4</x>
         <y>3</y>
         <width>60</width>
         <height>30</height>
@@ -523,7 +523,7 @@ QLabel
      <widget class="QLabel" name="sensor_updn_temp_label">
       <property name="geometry">
        <rect>
-        <x>62</x>
+        <x>66</x>
         <y>3</y>
         <width>21</width>
         <height>30</height>
@@ -560,6 +560,44 @@ QLabel
        <number>1</number>
       </property>
      </widget>
+     <widget class="QLabel" name="statusbar">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>220</y>
+        <width>171</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">/*-----QLabel-----*/
+QLabel
+{
+	background-color: transparent;
+	color: #FE5010;
+	font: 11pt &quot;Source Sans Pro SemiBold&quot;;
+}</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="check_autoplay">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>220</y>
+        <width>16</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: transparent;</string>
+      </property>
+      <property name="text">
+       <string>CheckBox</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="weaher_and_forecast_tab">
      <attribute name="title">
@@ -586,41 +624,55 @@ QLabel
        </font>
       </property>
       <property name="styleSheet">
-       <string notr="true">QWidget{background:transparent}
+       <string notr="true">QWidget{background:transparent;
+color: rgb(229, 229, 229);
+}
+/* TOP TABS */
+QTabWidget {
+    border: 0px transparent black;
+}
+
+QTabWidget::pane {
+    border: 0px solid #76797C;
+    padding: 2px;
+    margin: 0px;
+}
+
+QTabWidget::tab-bar {
+   left: 60px; 
+}
+
 QTabBar {
     qproperty-drawBase: 0;
-    border-radius: 5px;
+    border-radius: 3px;
 }
 
 QTabBar:focus {
     border: 0px transparent black;
 }
-
-/* TOP TABS */
-
 QTabBar::tab:top {
-    color: #eff0f1;
-    border: 1px solid rgba(105, 105, 105, 100);
-    border-right: 1px rgb(127, 127, 127);
-    background-color: #54575B;
+    color: rgb(154, 154, 154);
+    border: 1px solid rgba(125, 125, 125, 100);
+    border-right: 0px rgb(127, 127, 127);
+    background-color: transparent;
     padding: 2px;
     min-width: 80px;
-	min-height: 20px;
+	min-height: 18px;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
 }
 
 QTabBar::tab:top:selected {
     color: #eff0f1;
-    background-color: #54575B;
+    background-color: rgb(85, 85, 85);
     border: 1px solid rgba(105, 105, 105, 100);
-    border-right: 4px solid rgb(255, 85, 0);
+    border-bottom: 1px solid rgb(255, 119, 0);
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
 }
 
 QTabBar::tab:top:!selected:hover {
-    background-color: qlineargradient(spread:pad, x1:0.527, y1:0.221591, x2:0.527363, y2:0.961, stop:0.606965 rgba(255, 85, 0, 0), stop:1 rgba(255, 111, 0, 240));
+    background-color: qlineargradient(spread:pad, x1:0.393, y1:0.669636, x2:0.393, y2:0.915, stop:0.606965 rgba(255, 55, 0, 0), stop:1 rgba(255, 111, 0, 240));
 }
 </string>
       </property>
@@ -631,7 +683,7 @@ QTabBar::tab:top:!selected:hover {
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="iconSize">
        <size>
@@ -688,16 +740,16 @@ QTabBar::tab:top:!selected:hover {
          <string>description</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
        <widget class="QLabel" name="weather_feels_label">
         <property name="geometry">
          <rect>
-          <x>230</x>
-          <y>30</y>
+          <x>200</x>
+          <y>60</y>
           <width>51</width>
-          <height>41</height>
+          <height>31</height>
          </rect>
         </property>
         <property name="font">
@@ -727,7 +779,7 @@ QTabBar::tab:top:!selected:hover {
        <widget class="QLabel" name="weather_humidity_label">
         <property name="geometry">
          <rect>
-          <x>170</x>
+          <x>180</x>
           <y>20</y>
           <width>71</width>
           <height>31</height>
@@ -760,10 +812,10 @@ QTabBar::tab:top:!selected:hover {
        <widget class="QLabel" name="weather_temperature_label">
         <property name="geometry">
          <rect>
-          <x>140</x>
+          <x>70</x>
           <y>50</y>
-          <width>101</width>
-          <height>91</height>
+          <width>131</width>
+          <height>71</height>
          </rect>
         </property>
         <property name="font">
@@ -793,8 +845,8 @@ QTabBar::tab:top:!selected:hover {
        <widget class="QLabel" name="weather_wind_label">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>140</y>
+          <x>60</x>
+          <y>130</y>
           <width>171</width>
           <height>21</height>
          </rect>
@@ -820,14 +872,14 @@ QTabBar::tab:top:!selected:hover {
          <string>wind</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
        <widget class="QLabel" name="weather_uvi_label">
         <property name="geometry">
          <rect>
           <x>210</x>
-          <y>140</y>
+          <y>100</y>
           <width>71</width>
           <height>21</height>
          </rect>
@@ -865,8 +917,8 @@ QTabBar::tab:top:!selected:hover {
        <widget class="QLabel" name="image_label">
         <property name="geometry">
          <rect>
-          <x>20</x>
-          <y>70</y>
+          <x>10</x>
+          <y>10</y>
           <width>80</width>
           <height>61</height>
          </rect>
@@ -887,7 +939,7 @@ QTabBar::tab:top:!selected:hover {
        <widget class="QLabel" name="weather_pressure_label">
         <property name="geometry">
          <rect>
-          <x>40</x>
+          <x>100</x>
           <y>20</y>
           <width>71</width>
           <height>31</height>
@@ -914,13 +966,13 @@ QTabBar::tab:top:!selected:hover {
          <string>000</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
        <widget class="QLabel" name="weather_time_label">
         <property name="geometry">
          <rect>
-          <x>100</x>
+          <x>90</x>
           <y>0</y>
           <width>91</width>
           <height>21</height>
@@ -998,7 +1050,7 @@ QTabBar::tab:top:!selected:hover {
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>80</y>
+          <y>60</y>
           <width>251</width>
           <height>51</height>
          </rect>
@@ -1032,14 +1084,14 @@ QTabBar::tab:top:!selected:hover {
          <rect>
           <x>90</x>
           <y>30</y>
-          <width>51</width>
+          <width>61</width>
           <height>31</height>
          </rect>
         </property>
         <property name="font">
          <font>
           <family>Source Sans Pro SemiBold</family>
-          <pointsize>14</pointsize>
+          <pointsize>18</pointsize>
           <weight>50</weight>
           <italic>false</italic>
           <bold>false</bold>
@@ -1050,7 +1102,7 @@ QTabBar::tab:top:!selected:hover {
 {
 	background-color: transparent;
 	color: #5da6e2;
-	font: 14pt &quot;Source Sans Pro SemiBold&quot;;
+	font: 18pt &quot;Source Sans Pro SemiBold&quot;;
 }</string>
         </property>
         <property name="text">
@@ -1065,14 +1117,14 @@ QTabBar::tab:top:!selected:hover {
          <rect>
           <x>150</x>
           <y>30</y>
-          <width>51</width>
+          <width>71</width>
           <height>31</height>
          </rect>
         </property>
         <property name="font">
          <font>
           <family>Source Sans Pro SemiBold</family>
-          <pointsize>14</pointsize>
+          <pointsize>18</pointsize>
           <weight>50</weight>
           <italic>false</italic>
           <bold>false</bold>
@@ -1083,7 +1135,7 @@ QTabBar::tab:top:!selected:hover {
 {
 	background-color: transparent;
 	color: #FE5010;
-	font: 14pt &quot;Source Sans Pro SemiBold&quot;;
+	font: 18pt &quot;Source Sans Pro SemiBold&quot;;
 }</string>
         </property>
         <property name="text">
@@ -1096,8 +1148,8 @@ QTabBar::tab:top:!selected:hover {
        <widget class="QLabel" name="forecast_image_label">
         <property name="geometry">
          <rect>
-          <x>0</x>
-          <y>0</y>
+          <x>5</x>
+          <y>5</y>
           <width>80</width>
           <height>61</height>
          </rect>
@@ -1115,10 +1167,10 @@ QTabBar::tab:top:!selected:hover {
        <widget class="QLabel" name="forecast_description_label">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>160</y>
-          <width>281</width>
-          <height>21</height>
+          <x>5</x>
+          <y>150</y>
+          <width>275</width>
+          <height>31</height>
          </rect>
         </property>
         <property name="font">
@@ -1145,14 +1197,14 @@ QTabBar::tab:top:!selected:hover {
          <string>description</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
        <widget class="QLabel" name="forecast_wind_label">
         <property name="geometry">
          <rect>
-          <x>110</x>
-          <y>140</y>
+          <x>60</x>
+          <y>120</y>
           <width>171</width>
           <height>21</height>
          </rect>
@@ -1178,7 +1230,7 @@ QTabBar::tab:top:!selected:hover {
          <string>wind</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </widget>
@@ -1195,7 +1247,9 @@ QTabBar::tab:top:!selected:hover {
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="//10.175.1.22/ext/we_ui/darkstyle.qrc"/>
+ </resources>
  <connections/>
  <designerdata>
   <property name="gridDeltaX">

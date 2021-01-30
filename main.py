@@ -14,6 +14,7 @@ from collections import deque
 from gc import collect
 from scipy.optimize import curve_fit
 import numpy as np
+import darkstyle
 collect()
 
 class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
@@ -25,7 +26,9 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         self.humi_graph_data = deque()
         self.temp_graph_data = deque()
         # Timer Periods
-        self.switch_tab_period = 6000
+        self.switch_weather_tab_period = 6000
+        self.switch_sensor_tab_period = 4000
+        self.switch_main_tab_period = 12000
         self.sensor_check_period = 1000
         self.graph_add_period = 1000  * 60
         self.graph_data_limit = 60
@@ -37,7 +40,7 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         self.temperature, self.pressure, self.humidity = 0,0,0
         self.setupUi(self)  # Это нужно для инициализации нашего дизайна
         work_dir = os.path.dirname(os.path.realpath(__file__))
-        qssFile=work_dir + "/qss/darkStyle.qss"
+        qssFile=work_dir + "/darkstyle.qss"
         with open(qssFile,"r") as fh:
             self.setStyleSheet(fh.read())
         # Sensor Timer
@@ -65,14 +68,19 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         self.weather_timer.setInterval(self.new_weather_period)
         self.weather_timer.timeout.connect(self.weather_timer_process)
         self.weather_timer.start()
-        # Switch tabWidget
-        self.switch_tab_timer = QtCore.QTimer()
-        self.switch_tab_timer.setInterval(self.switch_tab_period)
-        self.switch_tab_timer.timeout.connect(self.switch_tab)
-        self.switch_tab_timer.start()
+        #switch_sensor_tab
+        self.switch_main_tab_timer = QtCore.QTimer()
+        self.switch_main_tab_timer.setInterval(self.switch_main_tab_period)
+        self.switch_main_tab_timer.timeout.connect(self.switch_main_tab)
+        self.switch_main_tab_timer.start()
+        # Switch weather
+        self.switch_weather_tab_timer = QtCore.QTimer()
+        self.switch_weather_tab_timer.setInterval(self.switch_weather_tab_period)
+        self.switch_weather_tab_timer.timeout.connect(self.switch_weather_tab)
+        self.switch_weather_tab_timer.start()
         #switch_sensor_tab
         self.switch_sensor_tab_timer = QtCore.QTimer()
-        self.switch_sensor_tab_timer.setInterval(self.switch_tab_period)
+        self.switch_sensor_tab_timer.setInterval(self.switch_sensor_tab_period)
         self.switch_sensor_tab_timer.timeout.connect(self.switch_sensor_tab)
         self.switch_sensor_tab_timer.start()
         # plotWidget
@@ -105,6 +113,9 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         self.temp_plot.getPlotItem().enableAutoRange(axis=None, enable=True, x=None, y=None)
         self.temp_curve = self.temp_plot.plot(pen=pg.mkPen('g', width=1, style=QtCore.Qt.SolidLine))
         lh.addItem(self.temp_curve, 'температура ' + chr(176) + 'C')
+        # QRC
+        icon = QtGui.QIcon(":/checkbox_unchecked_disabled")
+        self.statusbar.setPixmap(QtGui.QPixmap(":/icon_branch_open"))
         # mqtt
         self.mqtt_client =mqtt.Client('bme280')
         self.mqtt_client.connect('localhost')
@@ -144,7 +155,7 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         #self.statusbar.showMessage("Графік оновлено",5000)
 
     def press_updown(self):
-        maximum = round(self.curve.getData()[1].max(), 2)
+        maximum = round(self.curve.getData()[1][0], 2)
         last_item = round(self.curve.getData()[1][-1], 2)
         #print(maximum, last_item)
         self.sensor_press_max_label.setText('max:' + str(maximum))
@@ -155,7 +166,7 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         else:
             self.sensor_updn_label.setText(chr(0x1eb8)) # down
     def humi_updown(self):
-        maximum = round(self.humi_curve.getData()[1].max(), 2)
+        maximum = round(self.humi_curve.getData()[1][0], 2)
         last_item = round(self.humi_curve.getData()[1][-1], 2)
         #print(maximum, last_item)
         if maximum < last_item:
@@ -165,7 +176,7 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         else:
             self.sensor_updn_humi_label.setText(chr(0x1eb8)) # down
     def temp_updown(self):
-        maximum = round(self.temp_curve.getData()[1].max(), 2)
+        maximum = round(self.temp_curve.getData()[1][0], 2)
         last_item = round(self.temp_curve.getData()[1][-1], 2)
         #print(maximum, last_item)
         if maximum < last_item:
@@ -174,7 +185,7 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
             self.sensor_updn_temp_label.setText(chr(0x2248)) # approx equal
         else:
             self.sensor_updn_temp_label.setText(chr(0x1eb8)) # down
-    def switch_tab(self):
+    def switch_weather_tab(self):
         #print(self.tabWidget.count())
         if self.tabWidget.currentIndex() == self.tabWidget.count() - 1:
             self.tabWidget.setCurrentIndex(0)
@@ -186,6 +197,12 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
             self.sensor_tab_widget.setCurrentIndex(0)
         else:
             self.sensor_tab_widget.setCurrentIndex(self.sensor_tab_widget.currentIndex() + 1)
+    def switch_main_tab(self):
+        #print(self.tabWidget.count())
+        if self.main_tab_widget.currentIndex() == self.main_tab_widget.count() - 1:
+            self.main_tab_widget.setCurrentIndex(0)
+        else:
+            self.main_tab_widget.setCurrentIndex(self.main_tab_widget.currentIndex() + 1)
     def set_weather_image(self, img):
         # image
         url = ' http://openweathermap.org/img/wn/' + img + '@2x.png'

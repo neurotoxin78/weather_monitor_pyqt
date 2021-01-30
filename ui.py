@@ -52,7 +52,7 @@ class Ui_MainWindow(object):
 "\n"
 "QTabBar::tab::selected {\n"
 "    color: #eff0f1;\n"
-"    background-color: #54575B;\n"
+"    background-color: rgb(120, 120, 120);\n"
 "    border: 0px solid #76797C;\n"
 "    border-left: 3px solid rgb(152, 152, 152);\n"
 "    border-top-right-radius: 0px;\n"
@@ -113,9 +113,9 @@ class Ui_MainWindow(object):
 "\n"
 "QTabBar::tab:top:selected {\n"
 "    color: #eff0f1;\n"
-"    background-color: #54575B;\n"
+"    background-color:rgb(110, 110, 110);\n"
 "    border: 1px solid rgba(105, 105, 105, 100);\n"
-"    border-bottom: 3px solid rgb(152, 152, 152);\n"
+"    border-bottom: 1px solid rgb(255, 119, 0);\n"
 "    border-top-left-radius: 3px;\n"
 "    border-top-right-radius: 3px;\n"
 "}\n"
@@ -127,28 +127,6 @@ class Ui_MainWindow(object):
         self.sensor_tab_widget.setTabPosition(QtWidgets.QTabWidget.North)
         self.sensor_tab_widget.setDocumentMode(True)
         self.sensor_tab_widget.setObjectName("sensor_tab_widget")
-        self.tab_pressure = QtWidgets.QWidget()
-        self.tab_pressure.setStyleSheet("")
-        self.tab_pressure.setObjectName("tab_pressure")
-        self.plot = PlotWidget(self.tab_pressure)
-        self.plot.setGeometry(QtCore.QRect(4, 10, 275, 131))
-        self.plot.setStyleSheet("background-color: transparent;\n"
-"color: #FB9902;\n"
-"")
-        self.plot.setObjectName("plot")
-        self.sensor_tab_widget.addTab(self.tab_pressure, "")
-        self.tab_humidity = QtWidgets.QWidget()
-        self.tab_humidity.setObjectName("tab_humidity")
-        self.humi_plot = PlotWidget(self.tab_humidity)
-        self.humi_plot.setGeometry(QtCore.QRect(4, 10, 275, 130))
-        self.humi_plot.setStyleSheet("/*-----QWidget-----*/\n"
-"QWidget\n"
-"{\n"
-"    background-color: transparent;\n"
-"    color: #FB9902;\n"
-"}")
-        self.humi_plot.setObjectName("humi_plot")
-        self.sensor_tab_widget.addTab(self.tab_humidity, "")
         self.tab_temperature = QtWidgets.QWidget()
         self.tab_temperature.setObjectName("tab_temperature")
         self.temp_plot = PlotWidget(self.tab_temperature)
@@ -161,8 +139,30 @@ class Ui_MainWindow(object):
 "}")
         self.temp_plot.setObjectName("temp_plot")
         self.sensor_tab_widget.addTab(self.tab_temperature, "")
+        self.tab_humidity = QtWidgets.QWidget()
+        self.tab_humidity.setObjectName("tab_humidity")
+        self.humi_plot = PlotWidget(self.tab_humidity)
+        self.humi_plot.setGeometry(QtCore.QRect(4, 10, 275, 130))
+        self.humi_plot.setStyleSheet("/*-----QWidget-----*/\n"
+"QWidget\n"
+"{\n"
+"    background-color: transparent;\n"
+"    color: #FB9902;\n"
+"}")
+        self.humi_plot.setObjectName("humi_plot")
+        self.sensor_tab_widget.addTab(self.tab_humidity, "")
+        self.tab_pressure = QtWidgets.QWidget()
+        self.tab_pressure.setStyleSheet("")
+        self.tab_pressure.setObjectName("tab_pressure")
+        self.plot = PlotWidget(self.tab_pressure)
+        self.plot.setGeometry(QtCore.QRect(4, 10, 275, 131))
+        self.plot.setStyleSheet("background-color: transparent;\n"
+"color: #FB9902;\n"
+"")
+        self.plot.setObjectName("plot")
+        self.sensor_tab_widget.addTab(self.tab_pressure, "")
         self.sensor_temp_label = QtWidgets.QLabel(self.sensor_tab)
-        self.sensor_temp_label.setGeometry(QtCore.QRect(0, 3, 60, 30))
+        self.sensor_temp_label.setGeometry(QtCore.QRect(4, 3, 60, 30))
         font = QtGui.QFont()
         font.setFamily("Source Sans Pro SemiBold")
         font.setPointSize(16)
@@ -291,7 +291,7 @@ class Ui_MainWindow(object):
         self.sensor_updn_humi_label.setIndent(1)
         self.sensor_updn_humi_label.setObjectName("sensor_updn_humi_label")
         self.sensor_updn_temp_label = QtWidgets.QLabel(self.sensor_tab)
-        self.sensor_updn_temp_label.setGeometry(QtCore.QRect(62, 3, 21, 30))
+        self.sensor_updn_temp_label.setGeometry(QtCore.QRect(66, 3, 21, 30))
         font = QtGui.QFont()
         font.setFamily("Source Sans Pro SemiBold")
         font.setPointSize(20)
@@ -310,6 +310,21 @@ class Ui_MainWindow(object):
         self.sensor_updn_temp_label.setWordWrap(True)
         self.sensor_updn_temp_label.setIndent(1)
         self.sensor_updn_temp_label.setObjectName("sensor_updn_temp_label")
+        self.statusbar = QtWidgets.QLabel(self.sensor_tab)
+        self.statusbar.setGeometry(QtCore.QRect(30, 220, 171, 20))
+        self.statusbar.setStyleSheet("/*-----QLabel-----*/\n"
+"QLabel\n"
+"{\n"
+"    background-color: transparent;\n"
+"    color: #FE5010;\n"
+"    font: 11pt \"Source Sans Pro SemiBold\";\n"
+"}")
+        self.statusbar.setText("")
+        self.statusbar.setObjectName("statusbar")
+        self.check_autoplay = QtWidgets.QCheckBox(self.sensor_tab)
+        self.check_autoplay.setGeometry(QtCore.QRect(0, 220, 16, 20))
+        self.check_autoplay.setStyleSheet("background-color: transparent;")
+        self.check_autoplay.setObjectName("check_autoplay")
         self.main_tab_widget.addTab(self.sensor_tab, "")
         self.weaher_and_forecast_tab = QtWidgets.QWidget()
         self.weaher_and_forecast_tab.setObjectName("weaher_and_forecast_tab")
@@ -323,41 +338,55 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(8)
         self.tabWidget.setFont(font)
-        self.tabWidget.setStyleSheet("QWidget{background:transparent}\n"
+        self.tabWidget.setStyleSheet("QWidget{background:transparent;\n"
+"color: rgb(229, 229, 229);\n"
+"}\n"
+"/* TOP TABS */\n"
+"QTabWidget {\n"
+"    border: 0px transparent black;\n"
+"}\n"
+"\n"
+"QTabWidget::pane {\n"
+"    border: 0px solid #76797C;\n"
+"    padding: 2px;\n"
+"    margin: 0px;\n"
+"}\n"
+"\n"
+"QTabWidget::tab-bar {\n"
+"   left: 60px; \n"
+"}\n"
+"\n"
 "QTabBar {\n"
 "    qproperty-drawBase: 0;\n"
-"    border-radius: 5px;\n"
+"    border-radius: 3px;\n"
 "}\n"
 "\n"
 "QTabBar:focus {\n"
 "    border: 0px transparent black;\n"
 "}\n"
-"\n"
-"/* TOP TABS */\n"
-"\n"
 "QTabBar::tab:top {\n"
-"    color: #eff0f1;\n"
-"    border: 1px solid rgba(105, 105, 105, 100);\n"
-"    border-right: 1px rgb(127, 127, 127);\n"
-"    background-color: #54575B;\n"
+"    color: rgb(154, 154, 154);\n"
+"    border: 1px solid rgba(125, 125, 125, 100);\n"
+"    border-right: 0px rgb(127, 127, 127);\n"
+"    background-color: transparent;\n"
 "    padding: 2px;\n"
 "    min-width: 80px;\n"
-"    min-height: 20px;\n"
+"    min-height: 18px;\n"
 "    border-top-left-radius: 3px;\n"
 "    border-top-right-radius: 3px;\n"
 "}\n"
 "\n"
 "QTabBar::tab:top:selected {\n"
 "    color: #eff0f1;\n"
-"    background-color: #54575B;\n"
+"    background-color: rgb(85, 85, 85);\n"
 "    border: 1px solid rgba(105, 105, 105, 100);\n"
-"    border-right: 4px solid rgb(255, 85, 0);\n"
+"    border-bottom: 1px solid rgb(255, 119, 0);\n"
 "    border-top-left-radius: 3px;\n"
 "    border-top-right-radius: 3px;\n"
 "}\n"
 "\n"
 "QTabBar::tab:top:!selected:hover {\n"
-"    background-color: qlineargradient(spread:pad, x1:0.527, y1:0.221591, x2:0.527363, y2:0.961, stop:0.606965 rgba(255, 85, 0, 0), stop:1 rgba(255, 111, 0, 240));\n"
+"    background-color: qlineargradient(spread:pad, x1:0.393, y1:0.669636, x2:0.393, y2:0.915, stop:0.606965 rgba(255, 55, 0, 0), stop:1 rgba(255, 111, 0, 240));\n"
 "}\n"
 "")
         self.tabWidget.setTabPosition(QtWidgets.QTabWidget.North)
@@ -386,10 +415,10 @@ class Ui_MainWindow(object):
 "    font: 14pt \"Source Pro\";\n"
 "}")
         self.weather_description_label.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.weather_description_label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.weather_description_label.setAlignment(QtCore.Qt.AlignCenter)
         self.weather_description_label.setObjectName("weather_description_label")
         self.weather_feels_label = QtWidgets.QLabel(self.weather_tab)
-        self.weather_feels_label.setGeometry(QtCore.QRect(230, 30, 51, 41))
+        self.weather_feels_label.setGeometry(QtCore.QRect(200, 60, 51, 31))
         font = QtGui.QFont()
         font.setFamily("Source Sans Pro SemiBold")
         font.setPointSize(20)
@@ -406,7 +435,7 @@ class Ui_MainWindow(object):
         self.weather_feels_label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.weather_feels_label.setObjectName("weather_feels_label")
         self.weather_humidity_label = QtWidgets.QLabel(self.weather_tab)
-        self.weather_humidity_label.setGeometry(QtCore.QRect(170, 20, 71, 31))
+        self.weather_humidity_label.setGeometry(QtCore.QRect(180, 20, 71, 31))
         font = QtGui.QFont()
         font.setFamily("Source Sans Pro SemiBold")
         font.setPointSize(14)
@@ -423,7 +452,7 @@ class Ui_MainWindow(object):
         self.weather_humidity_label.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.weather_humidity_label.setObjectName("weather_humidity_label")
         self.weather_temperature_label = QtWidgets.QLabel(self.weather_tab)
-        self.weather_temperature_label.setGeometry(QtCore.QRect(140, 50, 101, 91))
+        self.weather_temperature_label.setGeometry(QtCore.QRect(70, 50, 131, 71))
         font = QtGui.QFont()
         font.setFamily("Source Sans Pro SemiBold")
         font.setPointSize(50)
@@ -440,7 +469,7 @@ class Ui_MainWindow(object):
         self.weather_temperature_label.setAlignment(QtCore.Qt.AlignCenter)
         self.weather_temperature_label.setObjectName("weather_temperature_label")
         self.weather_wind_label = QtWidgets.QLabel(self.weather_tab)
-        self.weather_wind_label.setGeometry(QtCore.QRect(10, 140, 171, 21))
+        self.weather_wind_label.setGeometry(QtCore.QRect(60, 130, 171, 21))
         font = QtGui.QFont()
         font.setFamily("Source Sans Pro SemiBold")
         font.setPointSize(14)
@@ -454,10 +483,10 @@ class Ui_MainWindow(object):
 "    color: #ffa73c;\n"
 "    font: 14pt \"Source Sans Pro SemiBold\";\n"
 "}")
-        self.weather_wind_label.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.weather_wind_label.setAlignment(QtCore.Qt.AlignCenter)
         self.weather_wind_label.setObjectName("weather_wind_label")
         self.weather_uvi_label = QtWidgets.QLabel(self.weather_tab)
-        self.weather_uvi_label.setGeometry(QtCore.QRect(210, 140, 71, 21))
+        self.weather_uvi_label.setGeometry(QtCore.QRect(210, 100, 71, 21))
         font = QtGui.QFont()
         font.setFamily("Source Sans Pro SemiBold")
         font.setPointSize(12)
@@ -476,13 +505,13 @@ class Ui_MainWindow(object):
         self.weather_uvi_label.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.weather_uvi_label.setObjectName("weather_uvi_label")
         self.image_label = QtWidgets.QLabel(self.weather_tab)
-        self.image_label.setGeometry(QtCore.QRect(20, 70, 80, 61))
+        self.image_label.setGeometry(QtCore.QRect(10, 10, 80, 61))
         self.image_label.setLineWidth(0)
         self.image_label.setScaledContents(False)
         self.image_label.setAlignment(QtCore.Qt.AlignCenter)
         self.image_label.setObjectName("image_label")
         self.weather_pressure_label = QtWidgets.QLabel(self.weather_tab)
-        self.weather_pressure_label.setGeometry(QtCore.QRect(40, 20, 71, 31))
+        self.weather_pressure_label.setGeometry(QtCore.QRect(100, 20, 71, 31))
         font = QtGui.QFont()
         font.setFamily("Source Sans Pro SemiBold")
         font.setPointSize(14)
@@ -496,10 +525,10 @@ class Ui_MainWindow(object):
 "    color: #FE5010;\n"
 "    font: 14pt \"Source Sans Pro SemiBold\";\n"
 "}")
-        self.weather_pressure_label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.weather_pressure_label.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.weather_pressure_label.setObjectName("weather_pressure_label")
         self.weather_time_label = QtWidgets.QLabel(self.weather_tab)
-        self.weather_time_label.setGeometry(QtCore.QRect(100, 0, 91, 21))
+        self.weather_time_label.setGeometry(QtCore.QRect(90, 0, 91, 21))
         font = QtGui.QFont()
         font.setFamily("Source Sans Pro SemiBold")
         font.setPointSize(12)
@@ -538,7 +567,7 @@ class Ui_MainWindow(object):
         self.forecast_date_label.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.forecast_date_label.setObjectName("forecast_date_label")
         self.forecast_temperature_label = QtWidgets.QLabel(self.forecast_tab)
-        self.forecast_temperature_label.setGeometry(QtCore.QRect(20, 80, 251, 51))
+        self.forecast_temperature_label.setGeometry(QtCore.QRect(20, 60, 251, 51))
         font = QtGui.QFont()
         font.setFamily("Source Sans Pro SemiBold")
         font.setPointSize(36)
@@ -555,10 +584,10 @@ class Ui_MainWindow(object):
         self.forecast_temperature_label.setAlignment(QtCore.Qt.AlignCenter)
         self.forecast_temperature_label.setObjectName("forecast_temperature_label")
         self.forecast_humidity_label = QtWidgets.QLabel(self.forecast_tab)
-        self.forecast_humidity_label.setGeometry(QtCore.QRect(90, 30, 51, 31))
+        self.forecast_humidity_label.setGeometry(QtCore.QRect(90, 30, 61, 31))
         font = QtGui.QFont()
         font.setFamily("Source Sans Pro SemiBold")
-        font.setPointSize(14)
+        font.setPointSize(18)
         font.setBold(False)
         font.setItalic(False)
         font.setWeight(50)
@@ -567,15 +596,15 @@ class Ui_MainWindow(object):
 "{\n"
 "    background-color: transparent;\n"
 "    color: #5da6e2;\n"
-"    font: 14pt \"Source Sans Pro SemiBold\";\n"
+"    font: 18pt \"Source Sans Pro SemiBold\";\n"
 "}")
         self.forecast_humidity_label.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.forecast_humidity_label.setObjectName("forecast_humidity_label")
         self.forecast_pressure_label = QtWidgets.QLabel(self.forecast_tab)
-        self.forecast_pressure_label.setGeometry(QtCore.QRect(150, 30, 51, 31))
+        self.forecast_pressure_label.setGeometry(QtCore.QRect(150, 30, 71, 31))
         font = QtGui.QFont()
         font.setFamily("Source Sans Pro SemiBold")
-        font.setPointSize(14)
+        font.setPointSize(18)
         font.setBold(False)
         font.setItalic(False)
         font.setWeight(50)
@@ -584,17 +613,17 @@ class Ui_MainWindow(object):
 "{\n"
 "    background-color: transparent;\n"
 "    color: #FE5010;\n"
-"    font: 14pt \"Source Sans Pro SemiBold\";\n"
+"    font: 18pt \"Source Sans Pro SemiBold\";\n"
 "}")
         self.forecast_pressure_label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.forecast_pressure_label.setObjectName("forecast_pressure_label")
         self.forecast_image_label = QtWidgets.QLabel(self.forecast_tab)
-        self.forecast_image_label.setGeometry(QtCore.QRect(0, 0, 80, 61))
+        self.forecast_image_label.setGeometry(QtCore.QRect(5, 5, 80, 61))
         self.forecast_image_label.setScaledContents(False)
         self.forecast_image_label.setAlignment(QtCore.Qt.AlignCenter)
         self.forecast_image_label.setObjectName("forecast_image_label")
         self.forecast_description_label = QtWidgets.QLabel(self.forecast_tab)
-        self.forecast_description_label.setGeometry(QtCore.QRect(10, 160, 281, 21))
+        self.forecast_description_label.setGeometry(QtCore.QRect(5, 150, 275, 31))
         font = QtGui.QFont()
         font.setFamily("Source Pro")
         font.setPointSize(14)
@@ -609,10 +638,10 @@ class Ui_MainWindow(object):
 "    font: 14pt \"Source Pro\";\n"
 "}")
         self.forecast_description_label.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.forecast_description_label.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.forecast_description_label.setAlignment(QtCore.Qt.AlignCenter)
         self.forecast_description_label.setObjectName("forecast_description_label")
         self.forecast_wind_label = QtWidgets.QLabel(self.forecast_tab)
-        self.forecast_wind_label.setGeometry(QtCore.QRect(110, 140, 171, 21))
+        self.forecast_wind_label.setGeometry(QtCore.QRect(60, 120, 171, 21))
         font = QtGui.QFont()
         font.setFamily("Source Sans Pro SemiBold")
         font.setPointSize(14)
@@ -626,24 +655,24 @@ class Ui_MainWindow(object):
 "    color: #ffa73c;\n"
 "    font: 14pt \"Source Sans Pro SemiBold\";\n"
 "}")
-        self.forecast_wind_label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.forecast_wind_label.setAlignment(QtCore.Qt.AlignCenter)
         self.forecast_wind_label.setObjectName("forecast_wind_label")
         self.tabWidget.addTab(self.forecast_tab, "")
         self.main_tab_widget.addTab(self.weaher_and_forecast_tab, "")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.main_tab_widget.setCurrentIndex(0)
+        self.main_tab_widget.setCurrentIndex(1)
         self.sensor_tab_widget.setCurrentIndex(0)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Погода та прогноз"))
-        self.sensor_tab_widget.setTabText(self.sensor_tab_widget.indexOf(self.tab_pressure), _translate("MainWindow", "Тиск"))
-        self.sensor_tab_widget.setTabText(self.sensor_tab_widget.indexOf(self.tab_humidity), _translate("MainWindow", "Вологість"))
         self.sensor_tab_widget.setTabText(self.sensor_tab_widget.indexOf(self.tab_temperature), _translate("MainWindow", "Температура"))
+        self.sensor_tab_widget.setTabText(self.sensor_tab_widget.indexOf(self.tab_humidity), _translate("MainWindow", "Вологість"))
+        self.sensor_tab_widget.setTabText(self.sensor_tab_widget.indexOf(self.tab_pressure), _translate("MainWindow", "Тиск"))
         self.sensor_temp_label.setText(_translate("MainWindow", "+20"))
         self.sensor_press_label.setText(_translate("MainWindow", "752"))
         self.sensor_humi_label.setText(_translate("MainWindow", "100%"))
@@ -652,6 +681,7 @@ class Ui_MainWindow(object):
         self.sensor_press_max_label.setText(_translate("MainWindow", "max: 752"))
         self.sensor_updn_humi_label.setText(_translate("MainWindow", "0"))
         self.sensor_updn_temp_label.setText(_translate("MainWindow", "0"))
+        self.check_autoplay.setText(_translate("MainWindow", "CheckBox"))
         self.main_tab_widget.setTabText(self.main_tab_widget.indexOf(self.sensor_tab), _translate("MainWindow", "Сенсор"))
         self.weather_description_label.setText(_translate("MainWindow", "description"))
         self.weather_feels_label.setText(_translate("MainWindow", "00"))
@@ -674,3 +704,4 @@ class Ui_MainWindow(object):
         self.main_tab_widget.setTabText(self.main_tab_widget.indexOf(self.weaher_and_forecast_tab), _translate("MainWindow", "Метеоданні"))
 
 from pyqtgraph import PlotWidget
+import darkstyle_rc
