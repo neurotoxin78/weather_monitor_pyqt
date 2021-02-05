@@ -1,5 +1,9 @@
 <RCC>
   <qresource prefix="/">
+    <file alias="airq_purple">darkstyle/airq_purple.png</file>
+    <file alias="airq_yellow">darkstyle/airq_yellow.png</file>
+    <file alias="airq_green">darkstyle/airq_green.png</file>
+    <file alias="airq_red">darkstyle/airq_red.png</file>
     <file alias="darkstyle.qss">darkstyle/darkstyle.qss</file>
     <file alias="icon_close">darkstyle/icon_close.png</file>
     <file alias="icon_restore">darkstyle/icon_restore.png</file>

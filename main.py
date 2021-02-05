@@ -12,21 +12,56 @@ from datetime import datetime
 import logging as log
 from collections import deque
 from gc import collect
-from scipy.optimize import curve_fit
+#from scipy.optimize import curve_fit
 import numpy as np
-import darkstyle
+import darkstyle_rc
 collect()
 
 class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
     def __init__(self):
         super().__init__()
+        # mqtt
+        self.mqtt_client =mqtt.Client('bme280')
+        self.mqtt_client.connect('localhost')
+        # Graphic deques
         self.net = Network()
         self.sensor = Sensor()
         self.graph_data = deque()
         self.humi_graph_data = deque()
         self.temp_graph_data = deque()
+        self.setupUi(self)  # Это нужно для инициализации нашего дизайна
+        # Apply stylesheet
+        stream = QtCore.QFile(':/darkstyle.qss')
+        stream.open(QtCore.QIODevice.ReadOnly)
+        self.setStyleSheet(QtCore.QTextStream(stream).readAll())
+        # Init and start
+        self.init_config()
+        self.create_timers()
+        self.create_plots()
+        self.start_timers() # Запуск оновлення данних
+        # start
+        #self.tabWidget.setCurrentIndex(0)
+        self.weather_timer_process()
+        self.airq_timer_process()
+        self.update_currency()
+        self.sensor_tab_widget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(0)
+        log.info('User Interface Initialized')
+    def start_timers(self):
+        self.sensor_timer.start()
+        self.graph_timer.start()
+        self.humi_graph_timer.start()
+        self.temp_graph_timer.start()
+        self.weather_timer.start()
+        self.switch_main_tab_timer.start()
+        self.switch_weather_tab_timer.start()
+        self.switch_sensor_tab_timer.start()
+        self.currency_timer.start()
+        self.airq_timer.start()
+
+    def init_config(self):
         # Timer Periods
-        self.switch_weather_tab_period = 6000
+        self.switch_weather_tab_period = 4000
         self.switch_sensor_tab_period = 4000
         self.switch_main_tab_period = 12000
         self.sensor_check_period = 1000
@@ -37,97 +72,167 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         self.temp_graph_add_period = 1000 * 60
         self.temp_graph_data_limit = 60
         self.new_weather_period = 1000 * 3200
+        self.new_airq_period = 1000 * 3200
+        self.get_gurrency_period = 1000 * 60 * 30
         self.temperature, self.pressure, self.humidity = 0,0,0
-        self.setupUi(self)  # Это нужно для инициализации нашего дизайна
-        work_dir = os.path.dirname(os.path.realpath(__file__))
-        qssFile=work_dir + "/darkstyle.qss"
-        with open(qssFile,"r") as fh:
-            self.setStyleSheet(fh.read())
-        # Sensor Timer
-        self.sensor_timer = QtCore.QTimer()
-        self.sensor_timer.setInterval(1000)
-        self.sensor_timer.timeout.connect(self.sensor_timer_process)
-        self.sensor_timer.start()
-        # Sensor Timer
-        self.graph_timer = QtCore.QTimer()
-        self.graph_timer.setInterval(self.graph_add_period)
-        self.graph_timer.timeout.connect(self.update_graph)
-        self.graph_timer.start()
-        # humi graph_data
-        self.humi_graph_timer = QtCore.QTimer()
-        self.humi_graph_timer.setInterval(self.humi_graph_add_period)
-        self.humi_graph_timer.timeout.connect(self.update_humi_graph)
-        self.humi_graph_timer.start()
-        # temp graph_data
-        self.temp_graph_timer = QtCore.QTimer()
-        self.temp_graph_timer.setInterval(self.temp_graph_add_period)
-        self.temp_graph_timer.timeout.connect(self.update_temp_graph)
-        self.temp_graph_timer.start()
-        # Weather Timer
-        self.weather_timer = QtCore.QTimer()
-        self.weather_timer.setInterval(self.new_weather_period)
-        self.weather_timer.timeout.connect(self.weather_timer_process)
-        self.weather_timer.start()
-        #switch_sensor_tab
-        self.switch_main_tab_timer = QtCore.QTimer()
-        self.switch_main_tab_timer.setInterval(self.switch_main_tab_period)
-        self.switch_main_tab_timer.timeout.connect(self.switch_main_tab)
-        self.switch_main_tab_timer.start()
-        # Switch weather
-        self.switch_weather_tab_timer = QtCore.QTimer()
-        self.switch_weather_tab_timer.setInterval(self.switch_weather_tab_period)
-        self.switch_weather_tab_timer.timeout.connect(self.switch_weather_tab)
-        self.switch_weather_tab_timer.start()
-        #switch_sensor_tab
-        self.switch_sensor_tab_timer = QtCore.QTimer()
-        self.switch_sensor_tab_timer.setInterval(self.switch_sensor_tab_period)
-        self.switch_sensor_tab_timer.timeout.connect(self.switch_sensor_tab)
-        self.switch_sensor_tab_timer.start()
-        # plotWidget
+    def create_plots(self):
+        # Pressure plotWidget
         background = QtGui.QBrush()
         background.setColor(QtGui.QColor(0x31363b))
-        l = pg.LegendItem((10,10), offset=(60,75))  # args are (size, offset)
+        l = pg.LegendItem((10,10), offset=(60,92))  # args are (size, offset)
         l.setParentItem(self.plot.graphicsItem())   # Note we do NOT call plt.addItem in this case
         self.plot.setBackground(background)
         self.plot.addLegend()
         self.plot.plotItem.showGrid(x=True, y=True, alpha=0.3)
         self.plot.getPlotItem().addLegend()
-        self.plot.getPlotItem().enableAutoRange(axis=None, enable=True, x=None, y=None)
-        self.curve = self.plot.plot(pen=pg.mkPen('r', width=1, name="атмосферний тиск", symbol='o',symbolPen='r', symbolBrush=0.5, style=QtCore.Qt.SolidLine))
+        self.plot.getPlotItem().enableAutoRange(axis='y', enable=True)
+        self.plot.setLogMode(x=True, y=False)
+        self.curve = self.plot.plot(pen=pg.mkPen('r', width=1, name="атмосферний тиск", symbolBrush=(0,0,200), symbolPen='w', symbol='o', symbolSize=14, style=QtCore.Qt.SolidLine))
         l.addItem(self.curve, 'атмосферний тиск mmHg')
+        self.plot.getPlotItem().hideAxis('bottom')
         #humi plotWidget
         # plotWidget
         self.humi_plot.setBackground(background)
-        lh = pg.LegendItem((10,10), offset=(95,75))  # args are (size, offset)
+        lh = pg.LegendItem((10,10), offset=(95,92))  # args are (size, offset)
         lh.setParentItem(self.humi_plot.graphicsItem())   # Note we do NOT call plt.addItem in this case
         self.humi_plot.plotItem.showGrid(x=True, y=True, alpha=0.3)
         self.humi_plot.getPlotItem().enableAutoRange(axis=None, enable=True, x=None, y=None)
+        self.humi_plot.setLogMode(x=True, y=False)
         self.humi_curve = self.humi_plot.plot(pen=pg.mkPen('b', width=1, style=QtCore.Qt.SolidLine))
         lh.addItem(self.humi_curve, 'вологість %')
+        self.humi_plot.getPlotItem().hideAxis('bottom')
         #temp plotWidget
         # plotWidget
         self.temp_plot.setBackground(background)
-        lh = pg.LegendItem((10,10), offset=(95,75))  # args are (size, offset)
-        lh.setParentItem(self.temp_plot.graphicsItem())   # Note we do NOT call plt.addItem in this case
+        lt = pg.LegendItem((10,10), offset=(95,92))  # args are (size, offset)
+        lt.setParentItem(self.temp_plot.graphicsItem())   # Note we do NOT call plt.addItem in this case
         self.temp_plot.plotItem.showGrid(x=True, y=True, alpha=0.3)
         self.temp_plot.getPlotItem().enableAutoRange(axis=None, enable=True, x=None, y=None)
+        self.temp_plot.setLogMode(x=True, y=False)
         self.temp_curve = self.temp_plot.plot(pen=pg.mkPen('g', width=1, style=QtCore.Qt.SolidLine))
-        lh.addItem(self.temp_curve, 'температура ' + chr(176) + 'C')
-        # QRC
-        icon = QtGui.QIcon(":/checkbox_unchecked_disabled")
-        self.statusbar.setPixmap(QtGui.QPixmap(":/icon_branch_open"))
-        # mqtt
-        self.mqtt_client =mqtt.Client('bme280')
-        self.mqtt_client.connect('localhost')
-        # Styling
+        lt.addItem(self.temp_curve, 'температура ' + chr(176) + 'C')
+        self.temp_plot.getPlotItem().hideAxis('bottom')
+    def create_timers(self):
+        # Sensor Timer
+        self.sensor_timer = QtCore.QTimer()
+        self.sensor_timer.setInterval(1000)
+        self.sensor_timer.timeout.connect(self.sensor_timer_process)
+        # Sensor Timer
+        self.graph_timer = QtCore.QTimer()
+        self.graph_timer.setInterval(self.graph_add_period)
+        self.graph_timer.timeout.connect(self.update_graph)
+        # humi graph_data
+        self.humi_graph_timer = QtCore.QTimer()
+        self.humi_graph_timer.setInterval(self.humi_graph_add_period)
+        self.humi_graph_timer.timeout.connect(self.update_humi_graph)
+        # temp graph_data
+        self.temp_graph_timer = QtCore.QTimer()
+        self.temp_graph_timer.setInterval(self.temp_graph_add_period)
+        self.temp_graph_timer.timeout.connect(self.update_temp_graph)
+        # Weather Timer
+        self.weather_timer = QtCore.QTimer()
+        self.weather_timer.setInterval(self.new_weather_period)
+        self.weather_timer.timeout.connect(self.weather_timer_process)
+        # AirQ Timer
+        self.airq_timer = QtCore.QTimer()
+        self.airq_timer.setInterval(self.new_airq_period)
+        self.airq_timer.timeout.connect(self.airq_timer_process)
+        #switch_sensor_tab
+        self.switch_main_tab_timer = QtCore.QTimer()
+        self.switch_main_tab_timer.setInterval(self.switch_main_tab_period)
+        self.switch_main_tab_timer.timeout.connect(self.switch_main_tab)
+        # Switch weather
+        self.switch_weather_tab_timer = QtCore.QTimer()
+        self.switch_weather_tab_timer.setInterval(self.switch_weather_tab_period)
+        self.switch_weather_tab_timer.timeout.connect(self.switch_weather_tab)
+        #switch_sensor_tab
+        self.switch_sensor_tab_timer = QtCore.QTimer()
+        self.switch_sensor_tab_timer.setInterval(self.switch_sensor_tab_period)
+        self.switch_sensor_tab_timer.timeout.connect(self.switch_sensor_tab)
+        # currency timer
+        self.currency_timer = QtCore.QTimer()
+        self.currency_timer.setInterval(self.get_gurrency_period)
+        self.currency_timer.timeout.connect(self.update_currency)
 
-        # start
-        self.tabWidget.setCurrentIndex(0)
-        self.weather_timer_process()
-        #self.update_graph()
-        #self.update_humi_graph()
-        log.info('User Interface Initialized')
+    def airq_timer_process(self):
+        __data = self.net.get_airq()
+        data = __data['data']
+        location = __data['city_name'] + ',' + __data['country_code']
+        pollution = data[0]
+        aqius = pollution['aqi'] #* 10
+        pm10 = round(pollution['pm10'], 2)
+        pm25 = round(pollution['pm25'], 2)
+        co = round(pollution['co'], 2)
+        o3 = round(pollution['o3'], 2)
+        no2 = round(pollution['no2'], 2)
+        so2 = round(pollution['so2'], 2)
+        #print(aqius, pm10, location)
+        self.airq_aqi_label.setText(str(aqius))
+        self.airq_location_label.setText(location)
+        self.airq_pm_label.setText("pm<sup>10</sup>:" + str(pm10) + " pm<sup>2.5</sup>:" + str(pm25))
+        self.airq_co_label.setText('CO:' + str(co) + ' µg/m³')
+        self.airq_o3_label.setText('O<sub>3</sub>:' + str(o3) + ' µg/m³' )
+        self.airq_no2_label.setText('NO<sub>2</sub>:' + str(no2) + ' µg/m³')
+        self.airq_so2_label.setText('SO<sub>2</sub>:' + str(so2) + ' µg/m³')
 
+        if aqius in range(0, 50): # Green range
+            self.airq_frame.setStyleSheet('background-color: rgb(76, 152, 0); border: 2px solid transparent; border-radius: 10px; padding: 2px;')
+            self.airq_image.setPixmap(QtGui.QPixmap(":/airq_green"))
+            self.airq_aqi_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_location_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_pm_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_co_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_o3_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_no2_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_so2_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+        elif aqius in range(51,100): #Yelow range`
+            self.airq_frame.setStyleSheet('background-color: rgb(255, 225, 30); border: 2px solid transparent; border-radius: 10px; padding: 2px;')
+            self.airq_image.setPixmap(QtGui.QPixmap(":/airq_yellow"))
+            self.airq_aqi_label.setStyleSheet('color: rgb(85, 85, 85); background-color: transparent')
+            self.airq_location_label.setStyleSheet('color: rgb(85, 85, 85); background-color: transparent')
+            self.airq_pm_label.setStyleSheet('color: rgb(85, 85, 85); background-color: transparent')
+            self.airq_co_label.setStyleSheet('color: rgb(85, 85, 85); background-color: transparent')
+            self.airq_o3_label.setStyleSheet('color: rgb(85, 85, 85); background-color: transparent')
+            self.airq_no2_label.setStyleSheet('color: rgb(85, 85, 85); background-color: transparent')
+            self.airq_so2_label.setStyleSheet('color: rgb(85, 85, 85); background-color: transparent')
+        elif aqius in range(101,150): # Orange range
+            self.airq_frame.setStyleSheet('background-color: rgb(255, 136, 0); border: 2px solid transparent; border-radius: 10px; padding: 2px;')
+            self.airq_image.setPixmap(QtGui.QPixmap(":/airq_yellow"))
+            self.airq_aqi_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_location_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_pm_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_co_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_o3_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_no2_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_so2_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+        elif aqius in range(151, 200): # Red range
+            self.airq_frame.setStyleSheet('background-color:  rgb(255, 64, 0); border: 2px solid transparent; border-radius: 10px; padding: 2px;')
+            self.airq_image.setPixmap(QtGui.QPixmap(":/airq_red"))
+            self.airq_aqi_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_location_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_pm_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_co_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_o3_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_no2_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_so2_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+        else:                           # Purple range
+            self.airq_frame.setStyleSheet('background-color: rgb(170, 0, 127); border: 2px solid transparent; border-radius: 10px; padding: 2px;')
+            self.airq_image.setPixmap(QtGui.QPixmap(":/airq_purple"))
+            self.airq_aqi_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_location_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_pm_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_co_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_o3_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_no2_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+            self.airq_so2_label.setStyleSheet('color: rgb(215, 215, 215); background-color: transparent')
+
+    def update_currency(self):
+        data = self.net.get_currency()
+        usd = round(data.get('USD_UAH'),2)
+        eur = round(data.get('EUR_UAH'), 2)
+        self.usd_label.setText(u"\u0024" + str(usd))
+        self.eur_label.setText(u"\u20AC" + str(eur))
+        #print(usd,eur)
     def update_temp_graph(self):
         if len(self.temp_graph_data) > self.temp_graph_data_limit:
             self.temp_graph_data.popleft() #remove oldest
@@ -198,7 +303,8 @@ class App(QtWidgets.QMainWindow, ui.Ui_MainWindow):
         else:
             self.sensor_tab_widget.setCurrentIndex(self.sensor_tab_widget.currentIndex() + 1)
     def switch_main_tab(self):
-        #print(self.tabWidget.count())
+        self.sensor_tab_widget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(0)
         if self.main_tab_widget.currentIndex() == self.main_tab_widget.count() - 1:
             self.main_tab_widget.setCurrentIndex(0)
         else:

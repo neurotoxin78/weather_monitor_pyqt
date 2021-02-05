@@ -1,5 +1,3 @@
-import smbus2
-import bme280
 
 class Sensor(object):
     """docstring for Sensors."""
